@@ -1,0 +1,31 @@
+{
+    "name": "yz-leady/goods-sku",
+    "description": "商品管理SKU体系",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Leady",
+            "email": "149307205@qq.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.1.3",
+        "laravel/framework": "*",
+        "encore/laravel-admin": "1.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Leady\\Goods\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Leady\\Goods\\ServiceProvider"
+            ],
+            "aliases": {
+                "LeadySingleArticle": "Leady\\Goods\\Facade"
+            }
+        }
+    }
+}
