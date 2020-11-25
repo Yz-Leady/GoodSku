@@ -1,10 +1,6 @@
 <div class="{{$viewClass['form-group']}}">
-
     <label for="{{$id}}" class="{{$viewClass['label']}} control-label">{{$label}}</label>
-
     <div class="{{$viewClass['field']}}">
-        {{--        <textarea id="{{$id}}" name="{{$name}}">{{ old($column, $value) }}</textarea>--}}
-
         <div class="sku_warp {{$class}}">
             <input type="hidden" class="Js_sku_input" name="{{$name}}" value="{{json_encode(old($column, $value))}}">
             <div class="sku_attr_select">
@@ -54,6 +50,8 @@
                 </table>
             </div>
         </div>
-
     </div>
 </div>
+<script>
+    var priceArray = JSON.parse('{{config('yzgoods.prices')}}');
+</script>

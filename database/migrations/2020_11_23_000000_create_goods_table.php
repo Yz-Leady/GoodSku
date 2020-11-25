@@ -12,7 +12,7 @@ class CreateGoodsTable extends Migration
      */
     public function up()
     {
-        Schema::create('single_articles', function (Blueprint $table) {
+        Schema::create('goods', function (Blueprint $table) {
             $table->increments('id');
             $table->morphs('store');
             $table->unsignedInteger('category_id')->nullable();
@@ -21,6 +21,7 @@ class CreateGoodsTable extends Migration
             $table->string('cover')->nullable();
             $table->json('pictures')->nullable();
             $table->longText('content')->nullable();
+            $table->boolean('status');
             $table->timestamps();
         });
     }
@@ -32,6 +33,6 @@ class CreateGoodsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('single_articles');
+        Schema::dropIfExists('goods');
     }
 }

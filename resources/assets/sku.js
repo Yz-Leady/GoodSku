@@ -5,6 +5,7 @@
     function SKU(warp) {
         this.warp = $(warp);
         this.attrs = {};
+        this.prices=priceArray;
         this.commonStock = 0; // 统一库存
         this.commonPrice = 0; // 统一价格
         this.init();
@@ -19,7 +20,6 @@
             if (!_dom.hasClass('btn-success')) {
                 _dom.addClass('btn-success').removeClass('btn-default')
                     .siblings().removeClass('btn-success').addClass('btn-default');
-
                 if (_dom.hasClass('Js_single_btn')) {
                     // 点击了单规格
                     // 隐藏多规格编辑DOM
