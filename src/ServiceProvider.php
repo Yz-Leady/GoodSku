@@ -46,7 +46,7 @@ class ServiceProvider extends LaravelServiceProvider
             'namespace'  => 'Leady\Goods\Controllers',
             'middleware' => config('admin.route.middleware'),
         ], function (Router $router) {
-            $router->resource(config('yzgoods.rooters.goods'), 'GoodsController');
+            $router->resource(config('yzgoods.routers.goods'), 'GoodsController');
         });
     }
 
