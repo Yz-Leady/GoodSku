@@ -24,6 +24,14 @@ class Good extends Model
         self::STATUS_SHELVES => '下架',
     ];
 
+    const STOCK_PAID    = 0;
+    const STOCK_CONFIRM = 1;
+
+    const STOCK_ARRAY = [
+        self::STOCK_PAID    => '支付扣库存',
+        self::STOCK_CONFIRM => '订单扣库存',
+    ];
+
     /**
      * 返回上架商品
      * @param  \Illuminate\Database\Eloquent\Builder  $query

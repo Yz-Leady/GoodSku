@@ -6,9 +6,10 @@ return [
 
     //价格体系
     'prices'     => [
-        'cast'  => '成本',
-        'price' => '售价',
-        'vip'   => '会员价',
+        'cast'    => '成本',
+        'price'   => '售价',
+        'vip'     => '会员价',
+        'welfare' => '福利价',
     ],
     //图片配置
     'images'     => [

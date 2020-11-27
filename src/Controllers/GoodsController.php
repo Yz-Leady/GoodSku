@@ -63,9 +63,45 @@ class GoodsController extends AdminController
         });
 
         $form->tab('参数配置', function (Form $form) {
-
+            $states = [
+                'on'  => ['value' => 1, 'text' => '是', 'color' => 'success'],
+                'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
+            ];
+            $form->radio('configs.configs.stock_type', '扣库存方式')
+                 ->options(Good::STOCK_ARRAY);
+            $form->switch('configs.configs.is_push', '是否推荐')->states($states);
+            $form->number('configs.configs.push_order', '推荐排序')
+                 ->default(0)
+                 ->min(0)
+                 ->max(99);
+            $form->radio('configs.configs.is_limit', '是否限购')->options([
+                0 => '无',
+                1 => '每天',
+                2 => '总限',
+            ]);
+            $form->number('configs.configs.limit_number', '限购数量')
+                 ->default(0)
+                 ->min(0)
+                 ->max(99);
         });
 
+        $form->tab('价格配置', function (Form $form) {
+            $form->html('此价格只在单规格时生效');
+            foreach (config('yzgoods.prices') as $key => $value) {
+                $form->currency('sku.' . $key, $value);
+            }
+            $form->number('sku.stock', '库存')->min(0);
+            $form->currency('sku.bonus1', '一级分销');
+            $form->currency('sku.bonus2', '二级分销');
+        });
+
+        $form->tab('商品规格', function (Form $form) {
+            $form->sku('sku.sku', '商品规格');
+        });
+
+        $form->saving(function (Form $form){
+
+        });
         return $form;
     }
 
