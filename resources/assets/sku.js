@@ -2,12 +2,15 @@
     // 上传地址
     const UploadHost = '/admin/upload_file';
 
-    function SKU(warp) {
+    function SKU(warp,priceArray) {
         this.warp = $(warp);
         this.attrs = {};
-        this.prices=priceArray;
-        this.commonStock = 0; // 统一库存
-        this.commonPrice = 0; // 统一价格
+        this.priceArray=priceArray;
+        this.commonArray=[];
+        for(var key in this.priceArray){
+            this.commonArray[key]=0;
+        }
+        this.commonStock=0;
         this.init();
     }
 
@@ -20,6 +23,7 @@
             if (!_dom.hasClass('btn-success')) {
                 _dom.addClass('btn-success').removeClass('btn-default')
                     .siblings().removeClass('btn-success').addClass('btn-default');
+
                 if (_dom.hasClass('Js_single_btn')) {
                     // 点击了单规格
                     // 隐藏多规格编辑DOM
@@ -86,11 +90,13 @@
         _this.warp.find('.sku_edit_warp tbody').on('keyup', 'input', _this.processSku.bind(_this));
 
         // 统一价格
-        _this.warp.find('.sku_edit_warp thead').on('keyup', 'input.Js_price', function () {
-            _this.commonPrice = $(this).val();
-            _this.warp.find('.sku_edit_warp tbody td[data-field="price"] input').val(_this.commonPrice);
-            _this.processSku()
+        _this.warp.find('.sku_edit_warp thead').on('keyup', 'input.Js_all_price', function () {
+            var key=$(this).data('key');
+            _this.commonArray[key] = $(this).val();
+            _this.warp.find('.sku_edit_warp tbody td[data-field="'+key+'"] input').val(_this.commonArray[key]);
+            _this.processSku();
         });
+
 
         // 统一库存
         _this.warp.find('.sku_edit_warp thead').on('keyup', 'input.Js_stock', function () {
@@ -199,7 +205,11 @@
                 thead_html += '<th>' + attr_name + '</th>'
             });
             thead_html += '<th style="width: 100px">图片</th>';
-            thead_html += '<th style="width: 100px">价格 <input value="' + _this.commonPrice + '" type="text" style="width: 50px" class="Js_price"></th>';
+
+            for(var key in _this.priceArray){
+                thead_html += '<th style="width: 100px">'+_this.priceArray[key]+'<input value="' + _this.commonArray[key] + '" type="text" style="width: 50px" data-key="'+key+'" class="Js_all_price"></th>';
+            }
+
             thead_html += '<th style="width: 100px">库存 <input value="' + _this.commonStock + '" type="text" style="width: 50px" class="Js_stock"></th>';
             thead_html += '</tr>';
             _this.warp.find('.sku_edit_warp thead').html(thead_html);
@@ -226,7 +236,9 @@
                     tbody_html += '<td data-field="' + attr_name + '">' + attr_val + '</td>';
                 });
                 tbody_html += '<td data-field="pic"><input value="" type="hidden" class="form-control"><span class="Js_sku_upload">+</span><span class="Js_sku_del_pic">清空</span></td>';
-                tbody_html += '<td data-field="price"><input value="' + _this.commonPrice + '" type="text" class="form-control"></td>';
+                for(var key in _this.priceArray){
+                    tbody_html += '<td data-field="'+key+'"><input value="' + _this.commonArray[key] + '" type="text" class="form-control"></td>';
+                }
                 tbody_html += '<td data-field="stock"><input value="' + _this.commonStock + '" type="text" class="form-control"></td>';
                 tbody_html += '</tr>'
             });

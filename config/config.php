@@ -3,13 +3,14 @@ return [
     //拥有商品的模型列表 User::class=>'用户'
     'store_list' => [
     ],
-
     //价格体系
     'prices'     => [
         'cast'    => '成本',
         'price'   => '售价',
         'vip'     => '会员价',
         'welfare' => '福利价',
+        'bonus1'  => '一级分销',
+        'bonus2'  => '二级分销',
     ],
     //图片配置
     'images'     => [

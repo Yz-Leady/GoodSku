@@ -35,6 +35,7 @@ class GoodsController extends AdminController
 
     public function form()
     {
+
         $form = new Form(new Good());
         $form->tab('商品基本信息', function (Form $form) {
             $form->select('store_type', '归属类型')
@@ -58,7 +59,7 @@ class GoodsController extends AdminController
                  ->removable()
                  ->uniqueName();
             $form->textarea('description', '商品描述');
-            $form->ueditor('content', '商品描述');
+            $form->editor('content', '商品描述');
             $form->radioButton('status', '状态')->options(Good::STATUS_ARRAY);
         });
 
@@ -96,12 +97,13 @@ class GoodsController extends AdminController
         });
 
         $form->tab('商品规格', function (Form $form) {
-            $form->sku('sku.sku', '商品规格');
+            $form->sku('sku.sku', '商品规格')->default(['']);
         });
 
-        $form->saving(function (Form $form){
+        $form->saving(function (Form $form) {
 
         });
+
         return $form;
     }
 

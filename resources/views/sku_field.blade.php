@@ -52,6 +52,3 @@
         </div>
     </div>
 </div>
-<script>
-    var priceArray = JSON.parse('{{config('yzgoods.prices')}}');
-</script>
