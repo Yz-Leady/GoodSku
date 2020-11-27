@@ -5,6 +5,7 @@ namespace Leady\Goods\Controllers;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use Illuminate\Support\Arr;
 use Leady\Goods\Models\Good;
 
 class GoodsController extends AdminController
@@ -40,7 +41,7 @@ class GoodsController extends AdminController
         $form->tab('商品基本信息', function (Form $form) {
             $form->select('store_type', '归属类型')
                  ->options(config('yzgoods.store_list'))
-                 ->load('store_id', config('yzgoods.ajaxs.stores'));
+                 ->load('store_id', route(config('yzgoods.ajaxs.stores')));
             $form->select('store_id', '归属')
                  ->options([
                      '0' => '系统',
@@ -48,8 +49,7 @@ class GoodsController extends AdminController
                  ->required();
             $form->text('title', '商品标题');
             $form->select('category_id', '商品分类')
-                 ->ajax(config('yzgoods.ajaxs.category'))
-                 ->required();
+                 ->ajax(config('yzgoods.ajaxs.category'));
             $form->image('cover', '商品展示图')
                  ->move(config('yzgoods.images.path') . date('Y/m/d'))
                  ->removable()
@@ -89,11 +89,11 @@ class GoodsController extends AdminController
         $form->tab('价格配置', function (Form $form) {
             $form->html('此价格只在单规格时生效');
             foreach (config('yzgoods.prices') as $key => $value) {
-                $form->currency('sku.' . $key, $value);
+                $form->currency('sku.price.prices.' . $key, $value);
             }
-            $form->number('sku.stock', '库存')->min(0);
-            $form->currency('sku.bonus1', '一级分销');
-            $form->currency('sku.bonus2', '二级分销');
+            $form->number('sku.price.prices.stock', '库存')->min(0);
+            $form->currency('sku.price.prices.bonus1', '一级分销');
+            $form->currency('sku.price.prices.bonus2', '二级分销');
         });
 
         $form->tab('商品规格', function (Form $form) {
@@ -101,9 +101,21 @@ class GoodsController extends AdminController
         });
 
         $form->saving(function (Form $form) {
-
+            $sku_array = $form->sku;
+            $skus      = $sku_array['sku'];
+            $prices    = $sku_array['price'];
+            $skus      = json_decode($skus);
+            $types     = $skus->type ?? '';
+            if ($types == 'many') {
+                $attr = [];
+                foreach ($skus->attrs as $key => $att) {
+                    $attr = Arr::crossJoin($attr, $att);
+                }
+            } else {
+                $attr = [];
+            }
+            dd($sku_array, $prices, $skus, $attr, $form);
         });
-
         return $form;
     }
 

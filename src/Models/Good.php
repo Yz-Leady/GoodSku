@@ -37,11 +37,10 @@ class Good extends Model
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeNormal(Builder $query):Builder
+    public function scopeNormal(Builder $query): Builder
     {
-        return $query->where('status',self::STATUS_NORMAL);
+        return $query->where('status', self::STATUS_NORMAL);
     }
-
 
     /**
      * 返回状态文字
@@ -53,12 +52,12 @@ class Good extends Model
     }
 
     /**
-     * 关联SKU
-     * @return mixed
+     * 关联多条SKU
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function sku()
+    public function skus(): HasMany
     {
-        return $this->hasOne(GoodSku::class);
+        return $this->hasMany(GoodSku::class);
     }
 
     /**

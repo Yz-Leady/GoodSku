@@ -12,7 +12,16 @@ class GoodSku extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'sku' => 'json',
+        'sku'   => 'json',
         'other' => 'json',
     ];
+
+    /**
+     * 价格关联
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function price(): HasOne
+    {
+        return $this->hasOne(GoodSkuPrice::class);
+    }
 }
