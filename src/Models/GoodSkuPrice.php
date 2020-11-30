@@ -11,6 +11,8 @@ class GoodSkuPrice extends Model
 
     use BelongsToGood;
 
+    protected $guarded = [];
+
     protected $casts = [
         'prices' => 'json',
     ];
