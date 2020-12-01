@@ -10,6 +10,7 @@ class Good extends Model
 {
 
     public    $sku_attrs;
+    public    $sku_config_attrs;
 
     public    $sku_prices;
 
@@ -50,9 +51,12 @@ class Good extends Model
     {
         $data = [];
         if ($this->sku_type == 'many') {
+            $prices      = GoodSkuPrice::whereIn('good_sku_id', $this->skus()->pluck('id')->toArray())
+                                       ->get();
             $data['sku'] = [
                 "type"  => "many",
                 "attrs" => $this->configs->configs['attrs'],
+                "sku"   => $prices->pluck('prices'),
             ];
         } elseif ($this->sku_type == 'single') {
             $data['prices'] = [];
@@ -66,6 +70,11 @@ class Good extends Model
     public function setSkuAttrsAttribute($value)
     {
         $this->sku_attrs = $value;
+    }
+
+    public function setSkuConfigAttrsAttribute($value)
+    {
+        $this->sku_config_attrs = $value;
     }
 
     public function setSkuPricesAttribute($value)
@@ -84,7 +93,7 @@ class Good extends Model
         $attr       = $price = [];
         foreach ($datas as $key => $data) {
             $attr[]  = array_slice($data, 0, $cuteNumber, true);
-            $price[] = array_slice($data, $cuteNumber, null, true);
+            $price[] = $data;
         }
 
         return [$attr, $price];

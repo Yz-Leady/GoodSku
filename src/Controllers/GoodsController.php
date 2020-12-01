@@ -5,6 +5,8 @@ namespace Leady\Goods\Controllers;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
+use Illuminate\Support\Arr;
 use Leady\Goods\Models\Good;
 
 class GoodsController extends AdminController
@@ -14,6 +16,7 @@ class GoodsController extends AdminController
 
     public function grid()
     {
+
         $grid = new Grid(new Good());
         $grid->column('ID', 'id');
         $grid->column('cover', '展示图');
@@ -33,9 +36,17 @@ class GoodsController extends AdminController
         return $grid;
     }
 
-    public function form()
+    public function edit($id, Content $content)
     {
+        return $content
+            ->title($this->title())
+            ->description($this->description['edit'] ?? trans('admin.edit'))
+            ->body($this->form($id)->edit($id));
+    }
 
+    public function form($id = '')
+    {
+        $good = Good::find($id);
         $form = new Form(new Good());
         $form->tab('商品基本信息', function (Form $form) {
             if (config('yzgoods.ajaxs.stores')) {
@@ -90,44 +101,39 @@ class GoodsController extends AdminController
                  ->min(0)
                  ->max(99);
         });
-
-        $form->tab('价格配置', function (Form $form) {
-            $form->html('此价格只在单规格时生效');
-            foreach (config('yzgoods.prices') as $key => $value) {
-                $form->currency('sku.prices.' . $key, $value);
-            }
-            $form->number('sku.prices.stock', '库存')->min(0);
-        });
-
-        $form->tab('商品规格', function (Form $form) {
-            $form->sku('sku.sku', '商品规格')->default(['']);
+        $form->tab('商品规格', function (Form $form) use ($good) {
+            $def = [
+                'type'  => 'many',
+                'attrs' => [],
+                'sku'   => [],
+            ];
+            $form->sku('sku.sku', '商品规格')->default($good->sku['sku'] ?? $def);
         });
 
         $form->saving(function (Form $form) {
-            $sku_array              = $form->sku;
-            $form->configs['attrs'] = $sku_array['sku']['attrs'] ?? [];
-            $skus                   = $sku_array['sku'];
-            $prices                 = $sku_array['prices'];
-            $skus                   = json_decode($skus, true);
-            $types                  = $skus['type'] ?? 'single';
-            if ($types == 'many') {
-                [$sku_attrs, $sku_prices] = Good::assemblySku($skus['attrs'], $skus['sku']);
-            } else {
-                $sku_attrs  = $types;
-                $sku_prices = $prices;
-            }
-            $form->model()->sku_attrs  = $sku_attrs;
-            $form->model()->sku_prices = $sku_prices;
-            $form->sku_type            = $types;
+            $sku_array = $form->sku;
+            $skus      = $sku_array['sku'];
+            $skus      = json_decode($skus, true);
+            [$sku_attrs, $sku_prices] = Good::assemblySku($skus['attrs'], $skus['sku']);
+            $form->model()->sku_attrs        = $sku_attrs;
+            $form->model()->sku_config_attrs = $skus['attrs'];
+            $form->model()->sku_prices       = $sku_prices;
         });
 
         $form->saved(function (Form $form) {
-            $good = $form->model();
-            $good->skus()->whereNotIn('sku', $good->sku_attrs)->delete();
+            $good = $form->model()->refresh();
+            $configs          = $good->configs->configs;
+            $configs['attrs'] = $good->sku_config_attrs;
+            $good->configs()->update([
+                'configs' => $configs,
+            ]);
+            $ids = [];
             foreach ($good->sku_attrs as $key => $attr) {
-                $sku = $good->skus()->updateOrCreate([
-                    'sku' => $attr,
-                ]);
+                $skuWhere = [];
+                foreach ($attr as $k => $v) {
+                    $skuWhere['sku->' . $k] = $v;
+                }
+                $sku = $good->skus()->updateOrCreate($skuWhere);
                 if ($sku) {
                     $price = $good->sku_prices[$key];
                     $sku->price()->updateOrCreate([
@@ -137,7 +143,9 @@ class GoodsController extends AdminController
                         'stock'  => $price['stock'],
                     ]);
                 }
+                $ids[] = $sku->id;
             }
+            $good->skus()->whereNotIn('id', $ids)->delete();
         });
 
         return $form;

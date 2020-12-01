@@ -2,11 +2,10 @@
     <label for="{{$id}}" class="{{$viewClass['label']}} control-label">{{$label}}</label>
     <div class="{{$viewClass['field']}}">
         <div class="sku_warp {{$class}}">
+
             <input type="hidden" class="Js_sku_input" name="{{$name}}" value="{{json_encode(old($column, $value))}}">
             <div class="sku_attr_select">
-                <span class="btn btn-success Js_single_btn" data-type="single">单规格</span>
-                &nbsp;&nbsp;&nbsp;&nbsp;
-                <span class="btn btn-default Js_many_btn" data-type="many">多规格</span>
+                <span class="btn btn-default Js_many_btn" data-type="many">规格设置</span>
             </div>
             <div class="sku_attr_key_val" style="display: none">
                 <table class="table table-bordered">

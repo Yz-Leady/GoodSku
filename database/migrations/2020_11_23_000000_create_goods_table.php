@@ -22,8 +22,6 @@ class CreateGoodsTable extends Migration
             $table->json('pictures')->nullable();
             $table->longText('content')->nullable();
             $table->boolean('status');
-            $table->string('sku_type','50')->nullable();
-
             $table->timestamps();
         });
     }
