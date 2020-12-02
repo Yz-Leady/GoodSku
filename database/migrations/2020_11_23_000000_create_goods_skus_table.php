@@ -3,7 +3,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateGoodSkuPricesTable extends Migration
+class CreateGoodsSkusTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,12 +12,11 @@ class CreateGoodSkuPricesTable extends Migration
      */
     public function up()
     {
-        Schema::create('good_sku_prices', function (Blueprint $table) {
+        Schema::create('goods_skus', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('good_id');
-            $table->unsignedInteger('good_sku_id');
-            $table->json('prices')->nullable();
-            $table->unsignedInteger('stock')->nullable();
+            $table->unsignedInteger('goods_id');
+            $table->json('sku')->nullable();
+            $table->json('other')->nullable();
             $table->timestamps();
         });
     }
@@ -29,6 +28,6 @@ class CreateGoodSkuPricesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('good_sku_prices');
+        Schema::dropIfExists('goods_skus');
     }
 }

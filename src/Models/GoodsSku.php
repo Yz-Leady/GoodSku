@@ -4,16 +4,17 @@ namespace Leady\Goods\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Leady\Goods\Models\Traits\BelongsToGood;
+use Leady\Goods\Models\Traits\GoodsSkuCanDo;
 
-class GoodSku extends Model
+class GoodsSku extends Model
 {
 
-    use BelongsToGood;
+    use BelongsToGood, GoodsSkuCanDo;
 
     protected $guarded = [];
 
     protected $casts   = [
-        'sku'   => 'json',
+        'sku' => 'json',
     ];
 
     protected static function boot()
@@ -30,7 +31,7 @@ class GoodSku extends Model
      */
     public function price()
     {
-        return $this->hasOne(GoodSkuPrice::class);
+        return $this->hasOne(GoodsSkuPrice::class);
     }
 
 }

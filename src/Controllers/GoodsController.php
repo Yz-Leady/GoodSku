@@ -6,8 +6,10 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
-use Illuminate\Support\Arr;
-use Leady\Goods\Models\Good;
+use Leady\Goods\Actions\Goods\GoodsAudit;
+use Leady\Goods\Actions\Goods\GoodsNormal;
+use Leady\Goods\Actions\Goods\GoodsShelves;
+use Leady\Goods\Models\Goods;
 
 class GoodsController extends AdminController
 {
@@ -16,19 +18,30 @@ class GoodsController extends AdminController
 
     public function grid()
     {
-
-        $grid = new Grid(new Good());
+        $grid = new Grid(new Goods());
+        $grid->actions(function(Grid\Displayers\Actions $actions){
+            if($actions->row->canAudit()){
+                $actions->add(new GoodsAudit());
+            }
+            if($actions->row->canNormal()){
+                $actions->add(new GoodsNormal());
+            }
+            if($actions->row->canShelves()){
+                $actions->add(new GoodsShelves());
+            }
+            $actions->disableView();
+        });
         $grid->column('ID', 'id');
         $grid->column('cover', '展示图');
         $grid->column('title', '标题');
         $grid->column('status', '状态')
-             ->using(Good::STATUS_ARRAY)
+             ->using(Goods::STATUS_ARRAY)
              ->label([
-                 Good::STATUS_INIT    => 'default',
-                 Good::STATUS_SUCCESS => 'primary',
-                 Good::STATUS_NORMAL  => 'success',
-                 Good::STATUS_REJECT  => 'danger',
-                 Good::STATUS_SHELVES => 'warning',
+                 Goods::STATUS_INIT    => 'default',
+                 Goods::STATUS_SUCCESS => 'primary',
+                 Goods::STATUS_NORMAL  => 'success',
+                 Goods::STATUS_REJECT  => 'danger',
+                 Goods::STATUS_SHELVES => 'warning',
              ]);
         $grid->column('created_at', '创建时间');
         $grid->column('updated_at', '更新时间');
@@ -46,8 +59,8 @@ class GoodsController extends AdminController
 
     public function form($id = '')
     {
-        $good = Good::find($id);
-        $form = new Form(new Good());
+        $good = Goods::find($id);
+        $form = new Form(new Goods());
         $form->tab('商品基本信息', function (Form $form) {
             if (config('yzgoods.ajaxs.stores')) {
                 $form->select('store_type', '归属类型')
@@ -76,7 +89,7 @@ class GoodsController extends AdminController
             $form->textarea('description', '商品描述');
             $editor = config('yzgoods.editor');
             $form->$editor('content', '商品描述');
-            $form->radioButton('status', '状态')->options(Good::STATUS_ARRAY);
+            $form->radioButton('status', '状态')->options(Goods::STATUS_ARRAY);
         });
 
         $form->tab('参数配置', function (Form $form) {
@@ -85,7 +98,7 @@ class GoodsController extends AdminController
                 'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
             ];
             $form->radio('configs.configs.stock_type', '扣库存方式')
-                 ->options(Good::STOCK_ARRAY);
+                 ->options(Goods::STOCK_ARRAY);
             $form->switch('configs.configs.is_push', '是否推荐')->states($states);
             $form->number('configs.configs.push_order', '推荐排序')
                  ->default(0)
@@ -114,7 +127,7 @@ class GoodsController extends AdminController
             $sku_array = $form->sku;
             $skus      = $sku_array['sku'];
             $skus      = json_decode($skus, true);
-            [$sku_attrs, $sku_prices] = Good::assemblySku($skus['attrs'], $skus['sku']);
+            [$sku_attrs, $sku_prices] = Goods::assemblySku($skus['attrs'], $skus['sku']);
             $form->model()->sku_attrs        = $sku_attrs;
             $form->model()->sku_config_attrs = $skus['attrs'];
             $form->model()->sku_prices       = $sku_prices;
@@ -145,7 +158,8 @@ class GoodsController extends AdminController
                 }
                 $ids[] = $sku->id;
             }
-            $good->skus()->whereNotIn('id', $ids)->delete();
+            $good->skus()->whereNotIn('id', $ids)->forceDelete();
+            $good->sku_price()->whereNotIn('good_sku_id', $ids)->forceDelete();
         });
 
         return $form;

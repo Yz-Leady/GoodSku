@@ -12,6 +12,9 @@ return [
         'bonus1'  => '一级分销',
         'bonus2'  => '二级分销',
     ],
+    'cache'      => [
+        'prefix' => 'leady_goods_',
+    ],
     //图片配置
     'images'     => [
         'path' => 'images/',

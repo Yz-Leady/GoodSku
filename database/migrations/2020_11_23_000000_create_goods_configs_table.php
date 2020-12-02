@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateGoodConfigsTable extends Migration
+class CreateGoodsConfigsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class CreateGoodConfigsTable extends Migration
      */
     public function up()
     {
-        Schema::create('good_configs', function (Blueprint $table) {
+        Schema::create('goods_configs', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('good_id')->nullable();
+            $table->unsignedInteger('goods_id')->nullable();
             $table->json('configs')->nullable();
             $table->timestamps();
         });
@@ -28,6 +28,6 @@ class CreateGoodConfigsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('good_configs');
+        Schema::dropIfExists('goods_configs');
     }
 }
