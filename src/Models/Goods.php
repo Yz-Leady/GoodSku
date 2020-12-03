@@ -51,6 +51,14 @@ class Goods extends Model
         self::STOCK_CONFIRM => '订单扣库存',
     ];
 
+    const FREIGHT_SINGLE   = 1;
+    const FREIGHT_UNIFIED  = 3;
+
+    const FREIGHT_ARRAY    = [
+        self::FREIGHT_SINGLE   => '单件计费',
+        self::FREIGHT_UNIFIED  => '计重运费',
+    ];
+
     protected static function boot()
     {
         parent::boot();
@@ -121,8 +129,6 @@ class Goods extends Model
 
         return [$attr, $price];
     }
-
-
 
     /**
      * 返回状态文字

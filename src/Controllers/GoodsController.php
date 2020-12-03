@@ -19,14 +19,14 @@ class GoodsController extends AdminController
     public function grid()
     {
         $grid = new Grid(new Goods());
-        $grid->actions(function(Grid\Displayers\Actions $actions){
-            if($actions->row->canAudit()){
+        $grid->actions(function (Grid\Displayers\Actions $actions) {
+            if ($actions->row->canAudit()) {
                 $actions->add(new GoodsAudit());
             }
-            if($actions->row->canNormal()){
+            if ($actions->row->canNormal()) {
                 $actions->add(new GoodsNormal());
             }
-            if($actions->row->canShelves()){
+            if ($actions->row->canShelves()) {
                 $actions->add(new GoodsShelves());
             }
             $actions->disableView();
@@ -113,6 +113,12 @@ class GoodsController extends AdminController
                  ->default(0)
                  ->min(0)
                  ->max(99);
+            $form->radio('configs.configs.freight_type', '运费模式')
+                 ->options(Goods::FREIGHT_ARRAY)
+                 ->when(Goods::FREIGHT_SINGLE, function ($form) {
+                     $form->currency('configs.configs.freight_single', '单件运费金额')
+                          ->default(0);
+                 });
         });
         $form->tab('商品规格', function (Form $form) use ($good) {
             $def = [
@@ -134,7 +140,7 @@ class GoodsController extends AdminController
         });
 
         $form->saved(function (Form $form) {
-            $good = $form->model()->refresh();
+            $good             = $form->model()->refresh();
             $configs          = $good->configs->configs;
             $configs['attrs'] = $good->sku_config_attrs;
             $good->configs()->update([
