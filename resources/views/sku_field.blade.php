@@ -2,7 +2,6 @@
     <label for="{{$id}}" class="{{$viewClass['label']}} control-label">{{$label}}</label>
     <div class="{{$viewClass['field']}}">
         <div class="sku_warp {{$class}}">
-
             <input type="hidden" class="Js_sku_input" name="{{$name}}" value="{{json_encode(old($column, $value))}}">
             <div class="sku_attr_select">
                 <span class="btn btn-default Js_many_btn" data-type="many">规格设置</span>
@@ -40,7 +39,6 @@
                     </tbody>
                 </table>
             </div>
-
             <!-- 操作SKU -->
             <div class="sku_edit_warp" style="display: none">
                 <table class="table table-bordered" style="width: auto">

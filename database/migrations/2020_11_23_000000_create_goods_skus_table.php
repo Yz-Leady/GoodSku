@@ -12,7 +12,6 @@ class CreateGoodsSkusTable extends Migration
      */
     public function up()
     {
-        Schema::dropIfExists('goods_skus');
         Schema::create('goods_skus', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('goods_id');
