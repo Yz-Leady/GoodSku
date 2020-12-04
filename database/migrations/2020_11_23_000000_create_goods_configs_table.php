@@ -13,6 +13,7 @@ class CreateGoodsConfigsTable extends Migration
      */
     public function up()
     {
+        Schema::dropIfExists('goods_configs');
         Schema::create('goods_configs', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('goods_id')->nullable();

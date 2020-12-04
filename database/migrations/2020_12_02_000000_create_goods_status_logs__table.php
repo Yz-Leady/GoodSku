@@ -13,6 +13,7 @@ class CreateGoodsStatusLogsTable extends Migration
      */
     public function up()
     {
+        Schema::dropIfExists('goods_status_logs');
         Schema::create('goods_status_logs', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('goods_id')->index();

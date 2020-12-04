@@ -13,6 +13,7 @@ class CreateGoodsTable extends Migration
      */
     public function up()
     {
+        Schema::dropIfExists('goods');
         Schema::create('goods', function (Blueprint $table) {
             $table->increments('id');
             $table->morphs('store');
