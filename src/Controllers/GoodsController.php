@@ -74,10 +74,10 @@ class GoodsController extends AdminController
                  ->options([
                      '0' => '系统',
                  ])
+                 ->load('category_id', route(config('yzgoods.ajaxs.category')))
                  ->required();
             $form->text('title', '商品标题');
-            $form->select('category_id', '商品分类')
-                 ->ajax(config('yzgoods.ajaxs.category'));
+            $form->select('category_id', '商品分类');
             $form->image('cover', '商品展示图')
                  ->move(config('yzgoods.images.path') . date('Y/m/d'))
                  ->removable()
