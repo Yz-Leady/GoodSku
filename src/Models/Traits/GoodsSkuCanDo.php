@@ -13,10 +13,10 @@ trait GoodsSkuCanDo
      */
     public function canBuy($number = 0)
     {
-        if ($this->good->canBuy()) {
+        if ($this->goods->canBuy()) {
             return false;
         }
-        $stock = $this->good->getStockCache($this->id);
+        $stock = $this->goods->getStockCache($this->id);
         if ($stock <= $number) {
             return false;
         }

@@ -10,10 +10,10 @@ use Leady\Goods\Models\Goods;
  */
 class GoodsStatusShelves
 {
-    public $good;
+    public $goods;
 
-    public function __construct(Goods $good)
+    public function __construct(Goods $goods)
     {
-        $this->good = $good;
+        $this->goods = $goods;
     }
 }

@@ -156,7 +156,7 @@ class GoodsController extends AdminController
                 if ($sku) {
                     $price = $good->sku_prices[$key];
                     $sku->price()->updateOrCreate([
-                        'good_id' => $good->id,
+                        'goods_id' => $good->id,
                     ], [
                         'prices' => $price,
                         'stock'  => $price['stock'],
@@ -165,7 +165,7 @@ class GoodsController extends AdminController
                 $ids[] = $sku->id;
             }
             $good->skus()->whereNotIn('id', $ids)->forceDelete();
-            $good->sku_price()->whereNotIn('good_sku_id', $ids)->forceDelete();
+            $good->sku_price()->whereNotIn('goods_sku_id', $ids)->forceDelete();
         });
 
         return $form;

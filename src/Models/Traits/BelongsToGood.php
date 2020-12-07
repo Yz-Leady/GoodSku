@@ -8,7 +8,7 @@ use Leady\Goods\Models\Goods;
 trait BelongsToGood
 {
 
-    public function good():BelongsTo
+    public function goods():BelongsTo
     {
         return $this->belongsTo(Goods::class)->withTrashed();
     }
