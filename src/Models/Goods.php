@@ -88,7 +88,7 @@ class Goods extends Model
     public function getSkuAttribute()
     {
         $data        = [];
-        $prices      = GoodsSkuPrice::whereIn('good_sku_id', $this->skus()->pluck('id')->toArray())
+        $prices      = GoodsSkuPrice::whereIn('goods_sku_id', $this->skus()->pluck('id')->toArray())
                                     ->get();
         $data['sku'] = [
             "type"  => "many",

@@ -21,7 +21,7 @@ trait GoodsSkuCache
         $data = [
             'attrs'  => $skus->pluck('sku', 'id')->toArray(),
             'stock'  => $stock,
-            'prices' => $this->sku_price->pluck('prices', 'good_sku_id')->toArray(),
+            'prices' => $this->sku_price->pluck('prices', 'goods_sku_id')->toArray(),
         ];
         Cache::put($cache_name, $data);
     }
@@ -42,15 +42,15 @@ trait GoodsSkuCache
 
     /**
      * 扣除缓存中目标SKU的库存
-     * @param  int  $good_sku_id 目标SKU的ID
+     * @param  int  $goods_sku_id 目标SKU的ID
      * @param  int  $number 要扣除的数量
      * @return bool
      */
-    public function deductStockCache(int $good_sku_id, int $number)
+    public function deductStockCache(int $goods_sku_id, int $number)
     {
         $data = self::getSkuCache();
-        if ($data['stock'][$good_sku_id] ?? false) {
-            $data['stock'][$good_sku_id] -= $number;
+        if ($data['stock'][$goods_sku_id] ?? false) {
+            $data['stock'][$goods_sku_id] -= $number;
             $cache_name                  = config('cache.prefix') . $this->id;
             Cache::put($cache_name, $data);
             return true;
@@ -62,15 +62,15 @@ trait GoodsSkuCache
     /**
      * 增加缓存中目标SKU的库存
      * @Author Leady
-     * @param  int  $good_sku_id 目标SKU的ID
+     * @param  int  $goods_sku_id 目标SKU的ID
      * @param  int  $number 要增加的数量
      * @return bool
      */
-    public function increaseStockCache(int $good_sku_id, int $number)
+    public function increaseStockCache(int $goods_sku_id, int $number)
     {
         $data = self::getSkuCache();
-        if ($data['stock'][$good_sku_id] ?? false) {
-            $data['stock'][$good_sku_id] += $number;
+        if ($data['stock'][$goods_sku_id] ?? false) {
+            $data['stock'][$goods_sku_id] += $number;
             $cache_name                  = config('cache.prefix') . $this->id;
             Cache::put($cache_name, $data);
             return true;
@@ -82,13 +82,13 @@ trait GoodsSkuCache
     /**
      * 从缓存中获取指定SKU的库存数量
      * @Author Leady
-     * @param  int  $good_sku_id 指定SKU的ID
+     * @param  int  $goods_sku_id 指定SKU的ID
      * @return int|mixed 商品指定SKU库存量
      */
-    public function getStockCache(int $good_sku_id)
+    public function getStockCache(int $goods_sku_id)
     {
         $data = self::getSkuCache();
-        return $data['stock'][$good_sku_id]??0;
+        return $data['stock'][$goods_sku_id]??0;
     }
 
 }
