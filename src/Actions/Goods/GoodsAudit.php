@@ -16,7 +16,7 @@ class GoodsAudit extends RowAction
     {
         try {
             if ($request->status == Goods::STATUS_SUCCESS) {
-                $model->audit_success($request->remark);
+                $model->audit_success($request->remark?:'');
             } elseif ($request->status == Goods::STATUS_REJECT) {
                 $model->audit_reject($request->remark);
             }

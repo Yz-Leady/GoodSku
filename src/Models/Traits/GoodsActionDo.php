@@ -20,7 +20,7 @@ trait GoodsActionDo
      * @param  string  $remark 备注
      * @return mixed
      */
-    public function start_log(int $befor, int $after, string $remark)
+    public function start_log(int $befor, int $after,$remark)
     {
         $log = $this->statuslog()->create([
             'befor'  => $befor,
