@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class GoodsNormal extends RowAction
 {
+    public $name = '上架';
+
     public function handle(Model $model)
     {
         try {
