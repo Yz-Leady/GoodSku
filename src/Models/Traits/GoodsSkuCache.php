@@ -12,7 +12,7 @@ trait GoodsSkuCache
      */
     public function setSkuCache()
     {
-        $cache_name = config('cache.prefix') . $this->id;
+        $cache_name = config('yzgoods.cache.prefix') . $this->id;
         $skus       = $this->skus;
         $stock      = [];
         foreach ($skus as $key => $sku) {
@@ -32,7 +32,7 @@ trait GoodsSkuCache
      */
     public function getSkuCache()
     {
-        $cache_name = config('cache.prefix') . $this->id;
+        $cache_name = config('yzgoods.cache.prefix') . $this->id;
         if (!Cache::has($cache_name)) {
             $this->setSkuCache();
         }
@@ -51,7 +51,7 @@ trait GoodsSkuCache
         $data = $this->getSkuCache();
         if ($data['stock'][$goods_sku_id] ?? false) {
             $data['stock'][$goods_sku_id] -= $number;
-            $cache_name                  = config('cache.prefix') . $this->id;
+            $cache_name                  = config('yzgoods.cache.prefix') . $this->id;
             Cache::put($cache_name, $data);
             return true;
         } else {
@@ -71,7 +71,7 @@ trait GoodsSkuCache
         $data = $this->getSkuCache();
         if ($data['stock'][$goods_sku_id] ?? false) {
             $data['stock'][$goods_sku_id] += $number;
-            $cache_name                  = config('cache.prefix') . $this->id;
+            $cache_name                  = config('yzgoods.cache.prefix') . $this->id;
             Cache::put($cache_name, $data);
             return true;
         } else {
