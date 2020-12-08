@@ -44,12 +44,12 @@ trait GoodsActionDo
         $this->status = $after = Goods::STATUS_SUCCESS;
         try {
             $this->save();
-            self::start_log($befor, $after, $remark);
+            $this->start_log($befor, $after, $remark);
             event(new GoodsAuditSuccess($this));
 
             return true;
         } catch (\Exception $e) {
-            self::start_log($befor, $after, $e->getMessage());
+            $this->start_log($befor, $after, $e->getMessage());
 
             return false;
         }
@@ -67,12 +67,12 @@ trait GoodsActionDo
         $this->status = $after = Goods::STATUS_REJECT;
         try {
             $this->save();
-            self::start_log($befor, $after, $remark);
+            $this->start_log($befor, $after, $remark);
             event(new GoodsAuditReject($this));
 
             return true;
         } catch (\Exception $e) {
-            self::start_log($befor, $after, $e->getMessage());
+            $this->start_log($befor, $after, $e->getMessage());
 
             return false;
         }
@@ -89,12 +89,12 @@ trait GoodsActionDo
         $this->status = $after = Goods::STATUS_NORMAL;
         try {
             $this->save();
-            self::start_log($befor, $after, '商品上架');
+            $this->start_log($befor, $after, '商品上架');
             event(new GoodsStatusNormal($this));
 
             return true;
         } catch (\Exception $e) {
-            self::start_log($befor, $after, $e->getMessage());
+            $this->start_log($befor, $after, $e->getMessage());
 
             return false;
         }
@@ -111,12 +111,12 @@ trait GoodsActionDo
         $this->status = $after = Goods::STATUS_SHELVES;
         try {
             $this->save();
-            self::start_log($befor, $after, '商品下架');
+            $this->start_log($befor, $after, '商品下架');
             event(new GoodsStatusShelves($this));
 
             return true;
         } catch (\Exception $e) {
-            self::start_log($befor, $after, $e->getMessage());
+            $this->start_log($befor, $after, $e->getMessage());
 
             return false;
         }
@@ -148,14 +148,14 @@ trait GoodsActionDo
     public function stock_deduct($model, $number = 1)
     {
         if (is_array($model)) {
-            $model = self::getSku($model);
+            $model =$this->getSku($model);
         }
         if (get_class($model) != GoodsSku::class) {
             return false;
         }
         try {
             $model->price()->decrement('stock', $number);
-            self::deductStockCache($model->id, $number);
+            $this->deductStockCache($model->id, $number);
 
             return true;
         } catch (\Exception $e) {

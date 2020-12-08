@@ -73,7 +73,7 @@ class Goods extends Model
         self::deleting(function ($model) {
             if ($model->forceDeleting) {
                 //永久删除记录
-                self::start_log($model->status, self::STATUS_FORCE, '永久删除');
+                $this->start_log($model->status, self::STATUS_FORCE, '永久删除');
             }
         });
         self::forceDeleted(function ($model) {

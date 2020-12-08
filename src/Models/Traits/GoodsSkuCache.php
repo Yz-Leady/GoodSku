@@ -1,94 +1,186 @@
 <?php
 
-namespace Leady\Goods\Models\Traits;
+namespace App\Admin\Controllers\Goods;
 
-use Illuminate\Support\Facades\Cache;
+use App\Models\Category;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
+use Leady\Goods\Actions\Goods\GoodsAudit;
+use Leady\Goods\Actions\Goods\GoodsNormal;
+use Leady\Goods\Actions\Goods\GoodsShelves;
+use Leady\Goods\Controllers\GoodsController;
+use Leady\Goods\Models\Goods;
 
-trait GoodsSkuCache
+class IndexController extends GoodsController
 {
 
-    /**
-     * 商品SKU进入缓存
-     */
-    public function setSkuCache()
+    public function grid()
     {
-        $cache_name = config('cache.prefix') . $this->id;
-        $skus       = $this->skus;
-        $stock      = [];
-        foreach ($skus as $key => $sku) {
-            $stock[$sku->id] = $sku->price->stock;
-        }
-        $data = [
-            'attrs'  => $skus->pluck('sku', 'id')->toArray(),
-            'stock'  => $stock,
-            'prices' => $this->sku_price->pluck('prices', 'goods_sku_id')->toArray(),
-        ];
-        Cache::put($cache_name, $data);
+        $grid = new Grid(new Goods());
+        $grid->actions(function (Grid\Displayers\Actions $actions) {
+            if ($actions->row->canAudit()) {
+                $actions->add(new GoodsAudit());
+            }
+            if ($actions->row->canNormal()) {
+                $actions->add(new GoodsNormal());
+            }
+            if ($actions->row->canShelves()) {
+                $actions->add(new GoodsShelves());
+            }
+            $actions->disableView();
+        });
+        $grid->column('id', '#ID#');
+        $grid->column('cover', '展示图')->image('', 80, 80);
+        $grid->column('分类')->display(function () {
+            return Category::where('id', $this->category_id)->value('title') ?? '无';
+        });
+        $grid->column('title', '标题');
+        $grid->column('status', '状态')
+             ->using(Goods::STATUS_ARRAY)
+             ->label([
+                 Goods::STATUS_INIT    => 'default',
+                 Goods::STATUS_SUCCESS => 'primary',
+                 Goods::STATUS_NORMAL  => 'success',
+                 Goods::STATUS_REJECT  => 'danger',
+                 Goods::STATUS_SHELVES => 'warning',
+             ]);
+        $grid->column('created_at', '创建时间');
+        $grid->column('updated_at', '更新时间');
+
+        return $grid;
     }
 
-    /**
-     * 获取商品SKU
-     * @return array 商品SKU缓存数组
-     */
-    public function getSkuCache()
+    public function edit($id, Content $content)
     {
-        $cache_name = config('cache.prefix') . $this->id;
-        if (!Cache::has($cache_name)) {
-            self::setSkuCache();
-        }
-
-        return Cache::get($cache_name, false);
+        return $content
+            ->title($this->title())
+            ->description($this->description['edit'] ?? trans('admin.edit'))
+            ->body($this->form($id)->edit($id));
     }
 
-    /**
-     * 扣除缓存中目标SKU的库存
-     * @param  int  $goods_sku_id 目标SKU的ID
-     * @param  int  $number 要扣除的数量
-     * @return bool
-     */
-    public function deductStockCache(int $goods_sku_id, int $number)
+    public function form($id = '')
     {
-        $data = self::getSkuCache();
-        if ($data['stock'][$goods_sku_id] ?? false) {
-            $data['stock'][$goods_sku_id] -= $number;
-            $cache_name                  = config('cache.prefix') . $this->id;
-            Cache::put($cache_name, $data);
-            return true;
-        } else {
-            return false;
-        }
-    }
+        $good = Goods::find($id);
+        $form = new Form(new Goods());
+        $form->tab('商品基本信息', function (Form $form) {
+            if (config('yzgoods.ajaxs.stores')) {
+                $form->select('store_type', '归属类型')
+                     ->options(config('yzgoods.store_list'))
+                     ->load('store_id', route(config('yzgoods.ajaxs.stores')));
+            } else {
+                $form->select('store_type', '归属类型')
+                     ->options(config('yzgoods.store_list'));
+            }
+            $form->select('store_id', '归属')
+                 ->options(function () {
+                     if ($this->store) {
+                         return [$this->store->id => $this->store->name];
+                     } else {
+                         return ['0' => '系统'];
+                     }
+                 })
+                 ->load('category_id', route(config('yzgoods.ajaxs.category')))
+                 ->required();
+            $form->text('title', '商品标题');
+            $form->select('category_id', '商品分类')
+                 ->options(function () {
+                     $category = Category::find($this->category_id);
+                     if ($category) {
+                         return [$category->id => $category->title];
+                     }
+                 });
+            $form->image('cover', '商品展示图')
+                 ->move(config('yzgoods.images.path') . date('Y/m/d'))
+                 ->removable()
+                 ->uniqueName();
+            $form->multipleImage('pictures', '轮播图')
+                 ->move(config('yzgoods.images.path') . date('Y/m/d'))
+                 ->removable()
+                 ->uniqueName();
+            $form->textarea('description', '商品描述');
+            $editor = config('yzgoods.editor');
+            $form->$editor('content', '商品描述');
+            $form->radioButton('status', '状态')->options(Goods::STATUS_ARRAY);
+        });
 
-    /**
-     * 增加缓存中目标SKU的库存
-     * @Author Leady
-     * @param  int  $goods_sku_id 目标SKU的ID
-     * @param  int  $number 要增加的数量
-     * @return bool
-     */
-    public function increaseStockCache(int $goods_sku_id, int $number)
-    {
-        $data = self::getSkuCache();
-        if ($data['stock'][$goods_sku_id] ?? false) {
-            $data['stock'][$goods_sku_id] += $number;
-            $cache_name                  = config('cache.prefix') . $this->id;
-            Cache::put($cache_name, $data);
-            return true;
-        } else {
-            return false;
-        }
-    }
+        $form->tab('参数配置', function (Form $form) {
+            $states = [
+                'on'  => ['value' => 1, 'text' => '是', 'color' => 'success'],
+                'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
+            ];
+            $form->radio('configs.configs.stock_type', '扣库存方式')
+                 ->options(Goods::STOCK_ARRAY);
+            $form->switch('configs.configs.is_push', '是否推荐')->states($states);
+            $form->number('configs.configs.push_order', '推荐排序')
+                 ->default(0)
+                 ->min(0)
+                 ->max(99);
+            $form->radio('configs.configs.is_limit', '是否限购')->options([
+                0 => '无',
+                1 => '每天',
+                2 => '总限',
+            ]);
+            $form->number('configs.configs.limit_number', '限购数量')
+                 ->default(0)
+                 ->min(0)
+                 ->max(99);
+            $form->radio('configs.configs.freight_type', '运费模式')
+                 ->options(Goods::FREIGHT_ARRAY)
+                 ->when(Goods::FREIGHT_SINGLE, function ($form) {
+                     $form->currency('configs.configs.freight_single', '单件运费金额')
+                          ->default(0);
+                 });
+        });
+        $form->tab('商品规格', function (Form $form) use ($good) {
+            $def = [
+                'type'  => 'many',
+                'attrs' => [],
+                'sku'   => [],
+            ];
+            $form->sku('sku.sku', '商品规格')->default($good->sku['sku'] ?? $def);
+        });
 
-    /**
-     * 从缓存中获取指定SKU的库存数量
-     * @Author Leady
-     * @param  int  $goods_sku_id 指定SKU的ID
-     * @return int|mixed 商品指定SKU库存量
-     */
-    public function getStockCache(int $goods_sku_id)
-    {
-        $data = self::getSkuCache();
-        return $data['stock'][$goods_sku_id]??0;
+        $form->saving(function (Form $form) {
+            $sku_array = $form->sku;
+            $skus      = $sku_array['sku'];
+            $skus      = json_decode($skus, true);
+            [$sku_attrs, $sku_prices] = Goods::assemblySku($skus['attrs'], $skus['sku']);
+            $form->model()->sku_attrs        = $sku_attrs;
+            $form->model()->sku_config_attrs = $skus['attrs'];
+            $form->model()->sku_prices       = $sku_prices;
+        });
+
+        $form->saved(function (Form $form) {
+            $good             = $form->model()->refresh();
+            $configs          = $good->configs->configs;
+            $configs['attrs'] = $good->sku_config_attrs;
+            $good->configs()->update([
+                'configs' => $configs,
+            ]);
+            $ids = [];
+            foreach ($good->sku_attrs as $key => $attr) {
+                $skuWhere = [];
+                foreach ($attr as $k => $v) {
+                    $skuWhere['sku->' . $k] = $v;
+                }
+                $sku = $good->skus()->updateOrCreate($skuWhere);
+                if ($sku) {
+                    $price = $good->sku_prices[$key];
+                    $sku->price()->updateOrCreate([
+                        'goods_id' => $good->id,
+                    ], [
+                        'prices' => $price,
+                        'stock'  => $price['stock'],
+                    ]);
+                }
+                $ids[] = $sku->id;
+            }
+            $good->skus()->whereNotIn('id', $ids)->forceDelete();
+            $good->sku_price()->whereNotIn('goods_sku_id', $ids)->forceDelete();
+        });
+
+        return $form;
     }
 
 }
