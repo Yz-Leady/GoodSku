@@ -6,6 +6,7 @@ use EasyWeChat\Kernel\Support\Arr;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Leady\Goods\Models\Traits\GoodsActionDo;
+use Leady\Goods\Models\Traits\GoodsAttribute;
 use Leady\Goods\Models\Traits\GoodsCanDo;
 use Leady\Goods\Models\Traits\GoodsSkuCache;
 use Leady\Goods\Models\Traits\GoodsScope;
@@ -17,7 +18,8 @@ class Goods extends Model
         GoodsActionDo,
         GoodsSkuCache,
         GoodsScope,
-        GoodsCanDo;
+        GoodsCanDo,
+        GoodsAttribute;
 
     public    $sku_attrs;
 
@@ -83,23 +85,6 @@ class Goods extends Model
             $model->sku_price()->delete();
         });
 
-    }
-
-    public function getSkuAttribute()
-    {
-        $data        = [];
-        $prices      = GoodsSkuPrice::whereIn('goods_sku_id', $this->skus()->pluck('id')->toArray())
-                                    ->get();
-        $data['sku'] = [
-            "type"  => "many",
-            "attrs" => $this->configs->configs['attrs'],
-            "sku"   => $prices->pluck('prices'),
-        ];
-
-        $this->setAttribute('sku', $data);
-        $this->attributes['sku'] = $data;
-
-        return $data;
     }
 
     public function setSkuAttrsAttribute($value)
