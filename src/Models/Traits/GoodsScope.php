@@ -7,6 +7,14 @@ use Leady\Goods\Models\Goods;
 
 trait GoodsScope
 {
+
+    public function scopeStore(Builder $query, Model $model)
+    {
+        return $query->whereHasMorph('store', get_class($model), function ($q) use ($model) {
+            $q->where('store_id', $model->id);
+        });
+    }
+
     /**
      * 返回上架商品
      * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -22,9 +30,9 @@ trait GoodsScope
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeShelves(Builder $query):Builder
+    public function scopeShelves(Builder $query): Builder
     {
-        return $query->where('status',Goods::STATUS_SHELVES);
+        return $query->where('status', Goods::STATUS_SHELVES);
     }
 
     /**
@@ -32,9 +40,9 @@ trait GoodsScope
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeSuccess(Builder $query):Builder
+    public function scopeSuccess(Builder $query): Builder
     {
-        return $query->where('status',Goods::STATUS_SUCCESS);
+        return $query->where('status', Goods::STATUS_SUCCESS);
     }
 
     /**
@@ -42,9 +50,9 @@ trait GoodsScope
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeReject(Builder $query):Builder
+    public function scopeReject(Builder $query): Builder
     {
-        return $query->where('status',Goods::STATUS_REJECT);
+        return $query->where('status', Goods::STATUS_REJECT);
     }
 
 }
