@@ -65,10 +65,11 @@ class GoodsController extends AdminController
             if (config('yzgoods.ajaxs.stores')) {
                 $form->select('store_type', '归属类型')
                      ->options(config('yzgoods.store_list'))
-                     ->load('store_id', route(config('yzgoods.ajaxs.stores')));
+                     ->load('store_id', route(config('yzgoods.ajaxs.stores')))
+                     ->required();
             } else {
                 $form->select('store_type', '归属类型')
-                     ->options(config('yzgoods.store_list'));
+                     ->options(config('yzgoods.store_list'))->required();
             }
             $form->select('store_id', '归属')
                  ->options([
@@ -76,7 +77,7 @@ class GoodsController extends AdminController
                  ])
                  ->load('category_id', route(config('yzgoods.ajaxs.category')))
                  ->required();
-            $form->text('title', '商品标题');
+            $form->text('title', '商品标题')->required();
             $form->select('category_id', '商品分类');
             $form->image('cover', '商品展示图')
                  ->move(config('yzgoods.images.path') . date('Y/m/d'))
@@ -86,9 +87,9 @@ class GoodsController extends AdminController
                  ->move(config('yzgoods.images.path') . date('Y/m/d'))
                  ->removable()
                  ->uniqueName();
-            $form->textarea('description', '商品描述');
+            $form->textarea('description', '商品描述')->required();
             $editor = config('yzgoods.editor');
-            $form->$editor('content', '商品描述');
+            $form->$editor('content', '商品内容');
             $form->radioButton('status', '状态')->options(Goods::STATUS_ARRAY);
         });
 
@@ -104,8 +105,11 @@ class GoodsController extends AdminController
                 'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
             ];
             $form->radio('configs.stock_type', '扣库存方式')
-                 ->options(Goods::STOCK_ARRAY);
-            $form->switch('configs.is_push', '是否推荐')->states($states);
+                 ->options(Goods::STOCK_ARRAY)
+                 ->default(Goods::STOCK_PAID);
+            $form->switch('configs.is_push', '是否推荐')
+                 ->states($states)
+                 ->default(0);
             $form->number('configs.push_order', '推荐排序')
                  ->default(0)
                  ->min(0)
@@ -121,11 +125,12 @@ class GoodsController extends AdminController
                      $form->rate('configs.preferential_rate', '优惠比例');
                  })
                  ->default(0);
+
             $form->radio('configs.is_limit', '是否限购')->options([
                 0 => '无',
                 1 => '每天',
                 2 => '总限',
-            ]);
+            ])->default(0);
             $form->number('configs.limit_number', '限购数量')
                  ->default(0)
                  ->min(0)
@@ -135,7 +140,7 @@ class GoodsController extends AdminController
                  ->when(Goods::FREIGHT_SINGLE, function ($form) {
                      $form->currency('configs.freight_single', '单件运费金额')
                           ->default(0);
-                 });
+                 })->default(Goods::FREIGHT_UNIFIED);
         });
         $form->tab('商品规格', function (Form $form) use ($good) {
             $def = [
@@ -145,7 +150,12 @@ class GoodsController extends AdminController
             ];
             $form->sku('sku.sku', '商品规格')->default($good->sku['sku'] ?? $def);
         });
-
+        $form->submitted(function (Form $form) {
+            $skus = json_decode($form->sku, true);
+            if (count($skus['attrs']) <= 0 || count($skus['sku']) <= 0) {
+                throw new \Exception('请填写规格配置');
+            }
+        });
         $form->saving(function (Form $form) {
             $sku_array = $form->sku;
             $skus      = $sku_array['sku'];
@@ -183,6 +193,7 @@ class GoodsController extends AdminController
             }
             $good->skus()->whereNotIn('id', $ids)->forceDelete();
             $good->sku_price()->whereNotIn('goods_sku_id', $ids)->forceDelete();
+            $good->fresh()->setSkuCache();
         });
 
         return $form;

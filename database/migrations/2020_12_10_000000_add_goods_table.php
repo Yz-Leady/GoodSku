@@ -14,8 +14,8 @@ class AddGoodsTable extends Migration
     public function up()
     {
         Schema::table('goods', function (Blueprint $table) {
-            $table->unsignedDecimal('min_price', 10, 2);
-            $table->unsignedInteger('sell_number');
+            $table->unsignedDecimal('min_price', 10, 2)->default(0);
+            $table->unsignedInteger('sell_number')->default(0);
         });
     }
 
