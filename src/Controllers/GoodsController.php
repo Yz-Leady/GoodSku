@@ -193,7 +193,7 @@ class GoodsController extends AdminController
             }
             $good->skus()->whereNotIn('id', $ids)->forceDelete();
             $good->sku_price()->whereNotIn('goods_sku_id', $ids)->forceDelete();
-            $good->fresh()->setSkuCache();
+            $good->refresh()->setSkuCache();
         });
 
         return $form;

@@ -70,7 +70,6 @@ class Goods extends Model
         parent::boot();
         self::created(function ($model) {
             $model->start_log(0, self::STATUS_INIT, '新增');
-            $model->setSkuCache();
         });
         self::deleting(function ($model) {
             if ($model->forceDeleting) {
