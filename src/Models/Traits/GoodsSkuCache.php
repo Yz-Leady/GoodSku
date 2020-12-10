@@ -22,7 +22,7 @@ trait GoodsSkuCache
         $data            = [
             'attrs'  => $skus->pluck('sku', 'id')->toArray(),
             'stock'  => $stock,
-            'min'    => min($prices->min('price')),
+            'min'    => $prices->min('price'),
             'prices' => $prices->toArray(),
         ];
         $this->min_price = $data['min'];
