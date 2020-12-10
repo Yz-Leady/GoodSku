@@ -93,30 +93,47 @@ class GoodsController extends AdminController
         });
 
         $form->tab('参数配置', function (Form $form) {
+            $form->radio('configs.showtype', '商品模式')
+                 ->options([
+                     'normal' => '正常',
+                     'story'  => '宣传商品',
+                 ])->default('normal')
+                 ->required();
             $states = [
                 'on'  => ['value' => 1, 'text' => '是', 'color' => 'success'],
                 'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
             ];
-            $form->radio('configs.configs.stock_type', '扣库存方式')
+            $form->radio('configs.stock_type', '扣库存方式')
                  ->options(Goods::STOCK_ARRAY);
-            $form->switch('configs.configs.is_push', '是否推荐')->states($states);
-            $form->number('configs.configs.push_order', '推荐排序')
+            $form->switch('configs.is_push', '是否推荐')->states($states);
+            $form->number('configs.push_order', '推荐排序')
                  ->default(0)
                  ->min(0)
                  ->max(99);
-            $form->radio('configs.configs.is_limit', '是否限购')->options([
+            $form->radio('configs.is_preferential', '是否特卖')
+                 ->options([
+                     0 => '否',
+                     1 => '是',
+                 ])
+                 ->when(1, function ($form) {
+                     $form->datetime('configs.preferential_start', '开始时间');
+                     $form->datetime('configs.preferential_end', '结束时间');
+                     $form->rate('configs.preferential_rate', '优惠比例');
+                 })
+                 ->default(0);
+            $form->radio('configs.is_limit', '是否限购')->options([
                 0 => '无',
                 1 => '每天',
                 2 => '总限',
             ]);
-            $form->number('configs.configs.limit_number', '限购数量')
+            $form->number('configs.limit_number', '限购数量')
                  ->default(0)
                  ->min(0)
                  ->max(99);
-            $form->radio('configs.configs.freight_type', '运费模式')
+            $form->radio('configs.freight_type', '运费模式')
                  ->options(Goods::FREIGHT_ARRAY)
                  ->when(Goods::FREIGHT_SINGLE, function ($form) {
-                     $form->currency('configs.configs.freight_single', '单件运费金额')
+                     $form->currency('configs.freight_single', '单件运费金额')
                           ->default(0);
                  });
         });
