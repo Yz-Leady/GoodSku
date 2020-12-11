@@ -12,6 +12,14 @@ return [
         'bonus1'  => '一级分销',
         'bonus2'  => '二级分销',
     ],
+    //关联配置
+    'relationship' => [
+        'coupon' => [
+            'class'=>'',
+            'type'=>'morphMany',
+            'foreignKey'=>'morphMany',
+        ],
+    ],
     'cache'      => [
         'prefix' => 'leady_goods_',
     ],

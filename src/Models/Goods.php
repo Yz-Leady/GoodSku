@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Leady\Goods\Models\Traits\GoodsActionDo;
 use Leady\Goods\Models\Traits\GoodsAttribute;
 use Leady\Goods\Models\Traits\GoodsCanDo;
+use Leady\Goods\Models\Traits\GoodsHasOther;
 use Leady\Goods\Models\Traits\GoodsSkuCache;
 use Leady\Goods\Models\Traits\GoodsScope;
 
@@ -19,7 +20,8 @@ class Goods extends Model
         GoodsSkuCache,
         GoodsScope,
         GoodsCanDo,
-        GoodsAttribute;
+        GoodsAttribute,
+        GoodsHasOther;
 
     public    $sku_attrs;
 
