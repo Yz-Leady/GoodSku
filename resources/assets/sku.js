@@ -345,9 +345,14 @@
                 },
                 processData: false, //告诉jQuery不要去处理发送的数据
                 success: function (res) {
-                    obj.css('background-image', 'url(' + res.url + ')');
-                    obj.parent().find('input').val(res.url);
-                    _this.processSku()
+                    if(res.code==1){
+                        toastr.success('上传成功');
+                        obj.css('background-image', 'url(' + res.showpath + ')');
+                        obj.parent().find('input').val(res.showpath);
+                        _this.processSku()
+                    }else{
+                        toastr.warning(res.message);
+                    }
                 }
             })
         }
