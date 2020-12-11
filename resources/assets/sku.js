@@ -1,6 +1,6 @@
 (function () {
     // 上传地址
-    const UploadHost = '/admin/upload_file';
+    const UploadHost = '/admin/goods/upload_file';
 
     function SKU(warp, priceArray) {
         this.warp = $(warp);
@@ -55,7 +55,10 @@
         });
 
         // 绑定添加属性名事件
-        _this.warp.find('.Js_add_attr_name').click(function () {
+        _this.warp.find('.Js_add_attr_name').on('click', function () {
+            if ($(this).attr('disabled')) {
+                return false;
+            }
             let html = '<tr>' +
                 '<td><input type="text" class="form-control"></td>' +
                 '<td>' +
@@ -75,13 +78,16 @@
                 '<span class="btn btn-danger Js_remove_attr_name">移除</span>' +
                 '</td>' +
                 '</tr>';
+            if (_this.warp.find('.sku_attr_key_val').find('tr').length == 3) {
+                $(this).attr('disabled', 'disabled');
+            }
             _this.warp.find('.sku_attr_key_val tbody').append(html)
         });
 
         // 绑定移除属性名事件
         _this.warp.find('.sku_attr_key_val').on('click', '.Js_remove_attr_name', function () {
-            console.log('移除属性名');
             $(this).parents('tr').remove();
+            _this.warp.find('.Js_add_attr_name').removeAttr('disabled');
             _this.getSkuAttr()
         });
 
@@ -246,7 +252,6 @@
 
             if (default_sku) {
                 // 填充数据
-                console.log(default_sku);
                 _this.warp.find('.sku_edit_warp tbody tr').each(function () {
                     let attrs = [];
                     let tr = $(this);
