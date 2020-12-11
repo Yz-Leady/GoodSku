@@ -2,15 +2,15 @@
     // 上传地址
     const UploadHost = '/admin/upload_file';
 
-    function SKU(warp,priceArray) {
+    function SKU(warp, priceArray) {
         this.warp = $(warp);
         this.attrs = {};
-        this.priceArray=priceArray;
-        this.commonArray=[];
-        for(var key in this.priceArray){
-            this.commonArray[key]=0;
+        this.priceArray = priceArray;
+        this.commonArray = [];
+        for (var key in this.priceArray) {
+            this.commonArray[key] = 0;
         }
-        this.commonStock=0;
+        this.commonStock = 0;
         this.init();
     }
 
@@ -91,9 +91,9 @@
 
         // 统一价格
         _this.warp.find('.sku_edit_warp thead').on('keyup', 'input.Js_all_price', function () {
-            var key=$(this).data('key');
+            var key = $(this).data('key');
             _this.commonArray[key] = $(this).val();
-            _this.warp.find('.sku_edit_warp tbody td[data-field="'+key+'"] input').val(_this.commonArray[key]);
+            _this.warp.find('.sku_edit_warp tbody td[data-field="' + key + '"] input').val(_this.commonArray[key]);
             _this.processSku();
         });
 
@@ -106,15 +106,15 @@
         });
 
         // SKU图片上传
-        _this.warp.find('.sku_edit_warp tbody').on('click', '.Js_sku_upload', function() {
+        _this.warp.find('.sku_edit_warp tbody').on('click', '.Js_sku_upload', function () {
             _this.upload($(this))
         });
 
         // 清空SKU图片
-        _this.warp.find('.sku_edit_warp tbody').on('click','.Js_sku_del_pic', function() {
+        _this.warp.find('.sku_edit_warp tbody').on('click', '.Js_sku_del_pic', function () {
             let td = $(this).parent();
             td.find('input').val('');
-            td.find('.Js_sku_upload').css('background-image','none');
+            td.find('.Js_sku_upload').css('background-image', 'none');
             _this.processSku()
         });
 
@@ -148,7 +148,7 @@
                     });
 
                     // 接着处理下一行
-                    if(index < attr_keys_len - 1) {
+                    if (index < attr_keys_len - 1) {
                         tr.find('td:eq(2) .Js_add_attr_name').trigger('click');
                     }
                 });
@@ -206,8 +206,8 @@
             });
             thead_html += '<th style="width: 100px">图片</th>';
 
-            for(var key in _this.priceArray){
-                thead_html += '<th style="width: 100px">'+_this.priceArray[key]+'<input value="' + _this.commonArray[key] + '" type="text" style="width: 50px" data-key="'+key+'" class="Js_all_price"></th>';
+            for (var key in _this.priceArray) {
+                thead_html += '<th style="width: 100px">' + _this.priceArray[key] + '<input value="' + _this.commonArray[key] + '" type="text" style="width: 50px" data-key="' + key + '" class="Js_all_price"></th>';
             }
 
             thead_html += '<th style="width: 100px">库存 <input value="' + _this.commonStock + '" type="text" style="width: 50px" class="Js_stock"></th>';
@@ -236,25 +236,45 @@
                     tbody_html += '<td data-field="' + attr_name + '">' + attr_val + '</td>';
                 });
                 tbody_html += '<td data-field="pic"><input value="" type="hidden" class="form-control"><span class="Js_sku_upload">+</span><span class="Js_sku_del_pic">清空</span></td>';
-                for(var key in _this.priceArray){
-                    tbody_html += '<td data-field="'+key+'"><input value="' + _this.commonArray[key] + '" type="text" class="form-control"></td>';
+                for (var key in _this.priceArray) {
+                    tbody_html += '<td data-field="' + key + '"><input value="' + _this.commonArray[key] + '" type="text" class="form-control"></td>';
                 }
                 tbody_html += '<td data-field="stock"><input value="' + _this.commonStock + '" type="text" class="form-control"></td>';
                 tbody_html += '</tr>'
             });
             _this.warp.find('.sku_edit_warp tbody').html(tbody_html);
 
-            if(default_sku) {
+            if (default_sku) {
                 // 填充数据
-                default_sku.forEach(function(item_sku, index) {
-                    let tr = _this.warp.find('.sku_edit_warp tbody tr').eq(index);
-                    Object.keys(item_sku).forEach(function(field) {
-                        let input = tr.find('td[data-field="'+field+'"] input');
-                        if(input.length) {
-                            input.val(item_sku[field]);
-                            let sku_upload = tr.find('td[data-field="'+field+'"] .Js_sku_upload');
-                            if(sku_upload.length) {
-                                sku_upload.css('background-image','url('+item_sku[field]+')');
+                console.log(default_sku);
+                _this.warp.find('.sku_edit_warp tbody tr').each(function () {
+                    let attrs = [];
+                    let tr = $(this);
+                    for (var i = 0; i < attr_names.length; i++) {
+                        var ttn = tr.find('td').eq(i);
+                        attrs[ttn.data('field')] = ttn.text();
+                    }
+                    let lastAttr = '';
+                    for (let attr_id in default_sku) {
+                        let res = true;
+                        for (let name in attrs) {
+                            if (default_sku[attr_id][name] != attrs[name]) {
+                                res = false;
+                                break;
+                            }
+                        }
+                        if (res) {
+                            lastAttr = default_sku[attr_id];
+                            break;
+                        }
+                    }
+                    Object.keys(lastAttr).forEach(function (field) {
+                        let input = tr.find('td[data-field="' + field + '"] input');
+                        if (input.length) {
+                            input.val(lastAttr[field]);
+                            let sku_upload = tr.find('td[data-field="' + field + '"] .Js_sku_upload');
+                            if (sku_upload.length) {
+                                sku_upload.css('background-image', 'url(' + lastAttr[field] + ')');
                             }
                         }
                     })
@@ -294,17 +314,17 @@
     };
 
     // 图片上传
-    SKU.prototype.upload = function(obj) {
+    SKU.prototype.upload = function (obj) {
         let _this = this;
         // 创建input[type="file"]元素
         let file_input = document.createElement('input');
-        file_input.setAttribute('type','file');
-        file_input.setAttribute('accept','image/x-png,image/jpeg');
+        file_input.setAttribute('type', 'file');
+        file_input.setAttribute('accept', 'image/x-png,image/jpeg');
 
         // 模拟点击 选择文件
         file_input.click();
 
-        file_input.onchange = function() {
+        file_input.onchange = function () {
             let file = file_input.files[0];  //获取上传的文件名
             let formData = new FormData();
             formData.append('file', file);
@@ -320,7 +340,7 @@
                 },
                 processData: false, //告诉jQuery不要去处理发送的数据
                 success: function (res) {
-                    obj.css('background-image','url('+res.url+')');
+                    obj.css('background-image', 'url(' + res.url + ')');
                     obj.parent().find('input').val(res.url);
                     _this.processSku()
                 }
