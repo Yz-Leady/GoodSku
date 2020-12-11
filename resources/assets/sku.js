@@ -137,11 +137,11 @@
                 let tbody = _this.warp.find('.sku_attr_key_val tbody');
                 let attr_keys = Object.keys(attr_names);
                 let attr_keys_len = attr_keys.length;
+
                 attr_keys.forEach(function (attr_key, index) {
                     // 规格名
                     let tr = tbody.find('tr').eq(index);
                     tr.find('td:eq(0) input').val(attr_key);
-
                     // 规格值
                     let attr_val_td = tr.find('td:eq(1)');
                     let attr_vals = attr_names[attr_key];
@@ -154,8 +154,9 @@
                     });
 
                     // 接着处理下一行
+                    console.log([index,attr_keys_len]);
                     if (index < attr_keys_len - 1) {
-                        tr.find('td:eq(2) .Js_add_attr_name').trigger('click');
+                        _this.warp.find('.Js_add_attr_name').trigger('click');
                     }
                 });
 
@@ -345,12 +346,12 @@
                 },
                 processData: false, //告诉jQuery不要去处理发送的数据
                 success: function (res) {
-                    if(res.code==1){
+                    if (res.code == 1) {
                         toastr.success('上传成功');
                         obj.css('background-image', 'url(' + res.showpath + ')');
                         obj.parent().find('input').val(res.showpath);
                         _this.processSku()
-                    }else{
+                    } else {
                         toastr.warning(res.message);
                     }
                 }
