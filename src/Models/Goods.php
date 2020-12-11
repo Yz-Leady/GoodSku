@@ -127,6 +127,11 @@ class Goods extends Model
         return self::STATUS_ARRAY[$this->status] ?? '无';
     }
 
+    public function store()
+    {
+        return $this->morphTo();
+    }
+
     /**
      * 关联多条SKU
      * @return mixed
