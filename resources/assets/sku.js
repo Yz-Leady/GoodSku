@@ -11,6 +11,7 @@
             this.commonArray[key] = 0;
         }
         this.commonStock = 0;
+        this.commonWeight= 0;
         this.init();
     }
 
@@ -108,6 +109,13 @@
         _this.warp.find('.sku_edit_warp thead').on('keyup', 'input.Js_stock', function () {
             _this.commonStock = $(this).val();
             _this.warp.find('.sku_edit_warp tbody td[data-field="stock"] input').val(_this.commonStock);
+            _this.processSku()
+        });
+
+        // 统一重量
+        _this.warp.find('.sku_edit_warp thead').on('keyup', 'input.Js_weight', function () {
+            _this.commonStock = $(this).val();
+            _this.warp.find('.sku_edit_warp tbody td[data-field="weight"] input').val(_this.commonWeight);
             _this.processSku()
         });
 
@@ -218,6 +226,7 @@
             }
 
             thead_html += '<th style="width: 100px">库存 <input value="' + _this.commonStock + '" type="text" style="width: 50px" class="Js_stock"></th>';
+            thead_html += '<th style="width: 100px">重量 <input value="' + _this.commonWeight + '" type="text" style="width: 50px" class="Js_weight"></th>';
             thead_html += '</tr>';
             _this.warp.find('.sku_edit_warp thead').html(thead_html);
 
@@ -247,6 +256,7 @@
                     tbody_html += '<td data-field="' + key + '"><input value="' + _this.commonArray[key] + '" type="text" class="form-control"></td>';
                 }
                 tbody_html += '<td data-field="stock"><input value="' + _this.commonStock + '" type="text" class="form-control"></td>';
+                tbody_html += '<td data-field="weight"><input value="' + _this.commonWeight + '" type="text" class="form-control"></td>';
                 tbody_html += '</tr>'
             });
             _this.warp.find('.sku_edit_warp tbody').html(tbody_html);
