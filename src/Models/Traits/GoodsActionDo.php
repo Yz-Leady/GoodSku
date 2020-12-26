@@ -6,6 +6,7 @@ use Leady\Goods\Events\GoodsAuditReject;
 use Leady\Goods\Events\GoodsAuditSuccess;
 use Leady\Goods\Events\GoodsStatusNormal;
 use Leady\Goods\Events\GoodsStatusUpdate;
+use Leady\Goods\Events\GoodsStatusShelves;
 use Leady\Goods\Models\Goods;
 use Leady\Goods\Models\GoodsSku;
 
@@ -15,12 +16,12 @@ trait GoodsActionDo
     /**
      * 商品状态变更记录
      * @author Leady
-     * @param  int     $befor 变更前状态
-     * @param  int     $after 变更后状态
-     * @param  string  $remark 备注
+     * @param  int     $befor   变更前状态
+     * @param  int     $after   变更后状态
+     * @param  string  $remark  备注
      * @return mixed
      */
-    public function start_log(int $befor, int $after,$remark)
+    public function start_log(int $befor, int $after, $remark)
     {
         $log = $this->statuslog()->create([
             'befor'  => $befor,
@@ -148,7 +149,7 @@ trait GoodsActionDo
     public function stock_deduct($model, $number = 1)
     {
         if (is_array($model)) {
-            $model =$this->getSku($model);
+            $model = $this->getSku($model);
         }
         if (get_class($model) != GoodsSku::class) {
             return false;
