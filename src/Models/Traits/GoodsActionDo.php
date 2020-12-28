@@ -41,6 +41,9 @@ trait GoodsActionDo
      */
     public function audit_success($remark = '审核通过')
     {
+        if (!$this->canAudit()) {
+            return false;
+        }
         $befor        = $this->status;
         $this->status = $after = Goods::STATUS_SUCCESS;
         try {
@@ -64,6 +67,7 @@ trait GoodsActionDo
      */
     public function audit_reject($remark = '')
     {
+
         $befor        = $this->status;
         $this->status = $after = Goods::STATUS_REJECT;
         try {
@@ -86,6 +90,9 @@ trait GoodsActionDo
      */
     public function status_normal()
     {
+        if (!$this->canNormal()) {
+            return false;
+        }
         $befor        = $this->status;
         $this->status = $after = Goods::STATUS_NORMAL;
         try {
@@ -108,6 +115,9 @@ trait GoodsActionDo
      */
     public function status_shelves()
     {
+        if (!$this->canShelves()) {
+            return false;
+        }
         $befor        = $this->status;
         $this->status = $after = Goods::STATUS_SHELVES;
         try {
