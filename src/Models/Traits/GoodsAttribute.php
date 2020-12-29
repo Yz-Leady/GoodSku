@@ -8,11 +8,15 @@ use Leady\Goods\Models\GoodsSkuPrice;
 
 trait GoodsAttribute
 {
+
     public function getSkuAttribute()
     {
-        $data        = [];
-        $prices      = GoodsSkuPrice::whereIn('goods_sku_id', $this->skus()->pluck('id')->toArray())
-                                    ->get();
+        $data   = [];
+        $prices = GoodsSkuPrice::whereIn('goods_sku_id', $this->skus()->pluck('id')->toArray())
+                               ->get();
+        foreach ($prices as $key => $price) {
+            $prices[$key]->prices['stock'] = $price->stock;
+        }
         $data['sku'] = [
             "type"  => "many",
             "attrs" => $this->configs->configs['attrs'],
@@ -52,4 +56,5 @@ trait GoodsAttribute
             return Storage::url($pic);
         });
     }
+
 }
