@@ -4,12 +4,13 @@ namespace Leady\Goods\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Leady\Goods\Models\Traits\BelongsToGood;
 
 class GoodsSkuPrice extends Model
 {
 
-    use BelongsToGood;
+    use BelongsToGood, SoftDeletes;
 
     protected $guarded = [];
 
