@@ -15,7 +15,9 @@ trait GoodsAttribute
         $prices = GoodsSkuPrice::whereIn('goods_sku_id', $this->skus()->pluck('id')->toArray())
                                ->get();
         foreach ($prices as $key => $price) {
-            $prices[$key]->prices['stock'] = $price->stock;
+            $temp                          = $prices[$key]->prices;
+            $temp['stock']                 = $price->stock;
+            $prices[$key]->prices = $temp;
         }
         $data['sku'] = [
             "type"  => "many",
