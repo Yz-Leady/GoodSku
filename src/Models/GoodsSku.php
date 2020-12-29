@@ -3,13 +3,14 @@
 namespace Leady\Goods\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Leady\Goods\Models\Traits\BelongsToGood;
 use Leady\Goods\Models\Traits\GoodsSkuCanDo;
 
 class GoodsSku extends Model
 {
 
-    use BelongsToGood, GoodsSkuCanDo;
+    use BelongsToGood, GoodsSkuCanDo, SoftDeletes;
 
     protected $guarded = [];
 
