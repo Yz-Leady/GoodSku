@@ -10,7 +10,7 @@ use Leady\Goods\Models\Traits\BelongsToGood;
 class GoodsSkuPrice extends Model
 {
 
-    use BelongsToGood, SoftDeletes;
+    use BelongsToGood;
 
     protected $guarded = [];
 

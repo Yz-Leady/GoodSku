@@ -10,7 +10,7 @@ use Leady\Goods\Models\Traits\GoodsSkuCanDo;
 class GoodsSku extends Model
 {
 
-    use BelongsToGood, GoodsSkuCanDo, SoftDeletes;
+    use BelongsToGood, GoodsSkuCanDo;
 
     protected $guarded = [];
 
