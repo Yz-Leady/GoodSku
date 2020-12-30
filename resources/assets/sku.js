@@ -114,7 +114,7 @@
 
         // 统一重量
         _this.warp.find('.sku_edit_warp thead').on('keyup', 'input.Js_weight', function () {
-            _this.commonStock = $(this).val();
+            _this.commonWeight = $(this).val();
             _this.warp.find('.sku_edit_warp tbody td[data-field="weight"] input').val(_this.commonWeight);
             _this.processSku()
         });
