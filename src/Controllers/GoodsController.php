@@ -175,11 +175,14 @@ class GoodsController extends AdminController
             ]);
             $ids = [];
             foreach ($good->sku_attrs as $key => $attr) {
-                $skuWhere = [];
-                foreach ($attr as $k => $v) {
-                    $skuWhere['sku->' . $k] = $v;
-                }
-                $sku = $good->skus()->updateOrCreate($skuWhere);
+                $rowkey = implode('|', array_values($attr));
+
+                $sku = $good->skus()->updateOrCreate([
+                    'rowkey' => $rowkey,
+                ], [
+                    'sku' => $attr,
+                ]);
+
                 if ($sku) {
                     $price = $good->sku_prices[$key];
                     $sku->price()->updateOrCreate([
